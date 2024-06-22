@@ -23,22 +23,22 @@ async def on_ready():
 @bot.command()
 async def info(ctx):
     embed = discord.Embed(title="Lunix",color=discord.Color.blue(), description="""
-        Whats up! I am Lunix, the offical bot of The Linux Hideout.
+        What's up! I am Lunix, the offical bot of The Linux Hideout!
         My prefix is '.'""")
     embed.add_field(name="Commands", value="""
-        .info
-        .rules
-        .roll
-        .roles
-        .channel
-        .wish user
-        .kamehameha
-        .8ball statement
-        .prowler
-        .calculate equation
-        .meme
+        .info - This command.
+        .rules - Displays *some* rules.
+        .roll - Rolls a dice.
+        .roles - Displays the roles you can get on this server as a member
+        .channel - Links NoobCoder's Youtube channel. 
+        .wish [user] - Wishes a user happy birthday.
+        .kamehameha - Sends a random Goku GIF
+        .8ball [statement] - Predicts the chances of a statement.
+        .prowler - Sends the prowler meme.
+        .calculate [equation] - Calculates an equasion
+        .meme - Sends a meme.
                     """, inline=False)
-    embed.add_field(name="", value="I will also reply to your messages occasionally!")
+    embed.add_field(name="", value="I may also reply to your messages occasionally!")
 
     embed.set_footer(text="Note: Currently Under Development")
 
@@ -97,7 +97,7 @@ async def wish(ctx, arg):
     if "@everyone" in arg or "@here" in arg:
         pass
     elif arg == "":
-        await ctx.send("You can't wish no one")
+        await ctx.send("Please provide a user to send your wishes to.")
     else:
         await ctx.send(f"Happy Birthday {arg}! 🎂🎂🎂")
 
