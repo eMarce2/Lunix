@@ -4,6 +4,16 @@ import time
 import random
 import aiohttp
 import json
+import requests
+import google.generativeai as genai
+
+ai_api = "key"
+discord_api = "key"
+fact_api = "key"
+
+
+genai.configure(api_key=ai_api)
+model = genai.GenerativeModel("gemini-1.5-flash", system_instruction="You are a discord bot called Lunix from a discord server named TheLinuxHideout. You talk like people do on whatsapp or discord. You use abbrevations for words like idk, lol, lmao. You also like to roast people")
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -37,6 +47,10 @@ async def info(ctx):
         .prowler
         .calculate equation
         .meme
+        .comic
+        .joke
+        .fact
+        .github
                     """, inline=False)
     embed.add_field(name="", value="I will also reply to your messages occasionally!")
 
@@ -61,6 +75,11 @@ async def rules(ctx):
     await ctx.send(file=discord.File("media/rules.jpg"))
 
 @bot.command()
+async def github(ctx):
+    await ctx.send("https://github.com/noobcoderyt/Lunix")
+    
+
+@bot.command()
 async def channel(ctx):
     await ctx.send("https://youtube.com/@noobcoderyt")
 
@@ -76,7 +95,7 @@ async def flip(ctx):
     time.sleep(0.5)
     await ctx.send("...")
     time.sleep(0.5)
-    await ctx.send(f"{random.choice(coin)}!!!")
+    await(f"{random.choice(coin)}!!!")
 
 @bot.command()
 async def roll(ctx):
@@ -90,7 +109,7 @@ async def roll(ctx):
     time.sleep(0.5)
     await ctx.send("...")
     time.sleep(0.5)
-    await ctx.send(f"{random.randint(1,6)}!!!")
+    await(f"{random.randint(1,6)}!!!")
 
 @bot.command()
 async def wish(ctx, arg):
@@ -104,6 +123,16 @@ async def wish(ctx, arg):
 @bot.command()
 async def kamehameha(ctx):
     await ctx.send(random.choice(kamehamehagifs))
+
+@bot.command()
+async def calculate(ctx, arg):
+    if arg == "":
+        await ctx.send("I can't calculate nothing")
+    else:
+        try:
+            await ctx.send(eval(arg))
+        except:
+            await ctx.send("Nah Im not that good")
     
 @bot.command(name="8ball")
 async def _8ball(ctx, arg):
@@ -125,4 +154,97 @@ async def meme(ctx):
             else:
                 await ctx.send('Error 404: Meme not found')
 
-bot.run("TOKEN")
+@bot.command()
+async def comic(ctx):
+    response = requests.get('https://xkcd.com/info.0.json')
+    data = response.json()
+    comic_title = data['title']
+    comic_url = data['img']
+    embed = discord.Embed(title=comic_title, color=discord.Colour.blue())
+    embed.set_image(url=comic_url)
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def joke(ctx):
+    response = requests.get("https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,racist,sexist,explicit")
+    data = response.json()
+    await ctx.send(f"{data['setup']} - {data['delivery']}")
+
+@bot.command()
+async def fact(ctx):
+    response = requests.get("https://api.api-ninjas.com/v1/facts", headers={'X-Api-Key': fact_api})
+    fact_data = json.loads(response.text)
+    fact_text = fact_data[0]['fact']
+    await ctx.send(fact_text)
+
+@bot.command()
+async def talk(ctx, *args):
+    arguments = " ".join(args)
+    response = model.generate_content(arguments)
+    await ctx.reply(response.text)
+    
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    if message.channel.id == 1253742174584180849:
+        chat = model.start_chat(history=[])
+        response = chat.send_message(message.content)
+        await message.reply(response.text)
+
+    
+    if "kys" in message.content.lower() or message.content == "NI":
+        await message.reply("stfu nigga who r u")
+
+    if "socket" in message.content.lower():
+        await message.reply("Socket more like Cocket lmfao")
+
+    if "scarry" in message.content.lower():
+        await message.reply("Mf be like I have a high end pc while running games in 20fps with 240p")
+
+    if ":trollface:" in message.content.lower():
+        await message.channel.send("<:ohwel:1212344068911271936>")
+    
+    if "hard" in message.content.lower():
+        await message.reply("thats what she said")
+
+    if "gato" in message.content.lower():
+        for i in range(random.randint(1,9)):
+            await message.channel.send("GATO IS BACK")
+            time.sleep(0.5)
+        await message.channel.send("<:tr:1248294470588563497>")
+
+    if "improved" in message.content.lower():
+        await message.reply("<:lie:1220656617691938817>")
+
+    if "new video" in message.content.lower():
+        await message.reply("maybe the new video was the friends we made along the way")
+
+    if "mint" in message.content.lower():
+        await message.channel.send("Hell yeah Linux Mint")
+
+    if message.content.startswith("?ban <@1126807595517227089>"):
+        await message.reply("Major Skill Issue detected ⚠️")
+
+    if "<@1253260636662792213>" in message.content:
+        await message.channel.send("I have been summoned")
+
+    if "mrace" in message.content.lower():
+        await message.reply("Mr ace more like Mr ass lmfaooooo")
+
+    if "discox" in message.content.lower():
+        await message.reply(f"Congratulations {message.author}! You are now *an* Member!")
+
+    if message.content.endswith("*"):
+        if message.content.startswith("*"):
+            return
+        else:
+            await message.reply("<:Nerd:1156881557680820284>")
+    
+    if message.content == "LLL" or message.content == "LL" or message.content == "L":
+        await message.reply("🫵")
+
+    await bot.process_commands(message)
+
+bot.run(discord_api)
